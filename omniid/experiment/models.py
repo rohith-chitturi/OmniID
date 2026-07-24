@@ -12,6 +12,7 @@ class ExperimentState(str, Enum):
 
 class RunArtifactManifest(BaseModel):
     config: str = "config.yaml"
+    canonical_config: str = "configuration.json"
     config_fingerprint: str = "config_fingerprint.txt"
     dataset_manifest: str = "dataset_manifest.json"
     metrics: str = "metrics.json"
