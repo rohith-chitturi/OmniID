@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
 import torch.nn as nn
 import torch
+from omniid.models.metadata import ModelMetadata
+from omniid.models.preprocess import PreprocessingSpec
 
 class BaseFoundationEncoder(nn.Module, ABC):
     """
@@ -12,17 +13,21 @@ class BaseFoundationEncoder(nn.Module, ABC):
         self._trainable = False
 
     @abstractmethod
+    def load_weights(self):
+        """Invoke the WeightManager to load specific assets."""
+        pass
+
+    @abstractmethod
     def encode(self, image: torch.Tensor, mode: str = "cls") -> torch.Tensor:
         """
         Extract features. Mode can be 'cls', 'patch', or 'pooled'.
         """
         pass
 
+    @property
     @abstractmethod
-    def get_preprocessing_transforms(self) -> Dict[str, Any]:
-        """
-        Returns the expected mean, std, and input resolution for this specific encoder.
-        """
+    def preprocess(self) -> PreprocessingSpec:
+        """Returns the specific preprocessing requirements for this encoder."""
         pass
 
     @property
@@ -32,20 +37,19 @@ class BaseFoundationEncoder(nn.Module, ABC):
 
     @property
     @abstractmethod
-    def patch_size(self) -> int:
-        pass
-
-    @property
-    @abstractmethod
-    def input_resolution(self) -> int:
+    def metadata(self) -> ModelMetadata:
         pass
         
+    def freeze(self):
+        self._trainable = False
+        for param in self.parameters():
+            param.requires_grad = False
+
+    def unfreeze(self):
+        self._trainable = True
+        for param in self.parameters():
+            param.requires_grad = True
+            
     @property
     def trainable(self) -> bool:
         return self._trainable
-        
-    @trainable.setter
-    def trainable(self, value: bool):
-        self._trainable = value
-        for param in self.parameters():
-            param.requires_grad = value
