@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "checkpoint_version": 1,
+    "framework_version": "0.1.0",
+    "experiment_id": "EXP-TEST",
+    "run_id": "RUN-TEST",
+    "config_fingerprint": "abc123hash",
+    "dataset_fingerprint": "mock_dataset_fp_123",
+    "global_step": 100,
+    "epoch": 1
+  },
+  "model_state_dict": {
+    "mock_layer": [
+      0.1,
+      0.2
+    ]
+  },
+  "optimizer_state_dict": {},
+  "scheduler_state_dict": {}
+}
