@@ -1,0 +1,9 @@
+defaults:
+  - dataset: synthetic_v1
+  - model: placeholder
+  - optimizer: adamw
+  - runtime: cpu
+
+experiment_id: auto
+seed: 42
+tags: []
