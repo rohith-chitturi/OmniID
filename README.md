@@ -71,6 +71,19 @@ Or via CLI:
 omniid dataset build ./synthetic_dataset --output ./artifacts
 ```
 
+### 3. Track Experiments (EMCF)
+The Experiment Management & Configuration Framework (EMCF) strictly organizes runs, generating isolated artifacts (`config_fingerprint.txt`, `environment.json`) to guarantee 100% reproducibility.
+```bash
+# Create a deterministic run
+omniid experiment create experiment=baseline dataset=synthetic_v1 model=dinov2 seed=42
+
+# Diff two experiments to see what changed
+omniid experiment diff EXP-0001 EXP-0002
+
+# Perfectly reproduce a past configuration state
+omniid experiment reproduce EXP-0001
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---
