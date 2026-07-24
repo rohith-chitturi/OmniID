@@ -30,6 +30,12 @@ def main():
     diff_parser.add_argument("exp1", type=str)
     diff_parser.add_argument("exp2", type=str)
 
+    # omniid experiment compare EXP-0001 RUN-0001 RUN-0002
+    comp_parser = exp_subparsers.add_parser("compare")
+    comp_parser.add_argument("exp_id", type=str)
+    comp_parser.add_argument("run1", type=str)
+    comp_parser.add_argument("run2", type=str)
+
     args = parser.parse_args()
 
     if args.command == "dataset" and args.action == "build":
@@ -79,6 +85,24 @@ def main():
                 
         elif args.exp_command == "reproduce":
             print(f"Reproducing {args.exp_id}... (Loads state and spins up pipeline)")
+            
+        elif args.exp_command == "compare":
+            try:
+                path1 = os.path.join("experiments", args.exp_id, args.run1, "configuration.json")
+                path2 = os.path.join("experiments", args.exp_id, args.run2, "configuration.json")
+                import json
+                with open(path1, "r") as f:
+                    cfg1 = json.load(f)
+                with open(path2, "r") as f:
+                    cfg2 = json.load(f)
+                
+                print(f"Comparing {args.exp_id}: {args.run1} vs {args.run2}")
+                # Naive dict compare for demo purposes
+                for k in cfg1.keys():
+                    if cfg1.get(k) != cfg2.get(k):
+                        print(f"{k}:\n  {args.run1}: {cfg1.get(k)}\n  {args.run2}: {cfg2.get(k)}\n")
+            except Exception as e:
+                print(f"Error comparing runs: {e}")
     else:
         parser.print_help()
 

@@ -50,6 +50,11 @@ class ExperimentRegistry:
         with open(os.path.join(run_dir, "config.yaml"), "w") as f:
             f.write(OmegaConf.to_yaml(cfg, resolve=True))
             
+        # Write Canonical Configuration JSON
+        container = OmegaConf.to_container(cfg, resolve=True)
+        with open(os.path.join(run_dir, "configuration.json"), "w") as f:
+            json.dump(container, f, indent=2)
+            
         # Write Config Fingerprint
         with open(os.path.join(run_dir, "config_fingerprint.txt"), "w") as f:
             f.write(cfg_fingerprint)
