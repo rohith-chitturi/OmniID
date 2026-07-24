@@ -7,5 +7,7 @@ def build_encoder(name: str, **kwargs) -> BaseFoundationEncoder:
     """
     # Ensure backbones are imported to trigger registration decorators
     import omniid.models.backbones.dinov2
+    import omniid.models.document_encoders.layoutlmv3
+    import omniid.models.document_encoders.donut
     
     return BACKBONE_REGISTRY.build(name, **kwargs)

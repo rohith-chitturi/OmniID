@@ -25,12 +25,25 @@ class BenchmarkHarness:
         # Profile Inference Latency
         inf_start = time.time()
         with torch.no_grad():
-            embeds = encoder.encode(dummy_input, mode="cls")
+            if hasattr(encoder, "encode") and hasattr(encoder, "preprocess") and hasattr(encoder.preprocess, "requires_ocr"):
+                # It's a BaseDocumentEncoder
+                from omniid.documents.pipeline import DocumentPreprocessingPipeline
+                from omniid.documents.ocr import MockOCRProvider
+                
+                pipeline = DocumentPreprocessingPipeline(spec, ocr_provider=MockOCRProvider())
+                doc_input = pipeline("mock_image")
+                output = encoder.encode(doc_input)
+                
+                # Use document_embedding for shape report
+                embeds = output.document_embedding
+            else:
+                # It's a BaseFoundationEncoder (Vision)
+                embeds = encoder.encode(dummy_input, mode="cls")
         latency = time.time() - inf_start
         
         meta = encoder.metadata
         
-        return {
+        result = {
             "Model": meta.name,
             "Architecture": meta.architecture,
             "Embedding": meta.embedding_dim,
@@ -39,5 +52,14 @@ class BenchmarkHarness:
             "Preprocessing Time": f"{preproc_time:.4f}s",
             "Inference": f"{latency:.4f}s",
             "Output Shape": list(embeds.shape),
-            "Memory": "N/A (CPU fallback mock)" # Mocking memory tracking for now
+            "Memory": "N/A (CPU fallback mock)"
         }
+        
+        # Inject Document-specific metrics
+        if hasattr(meta, "supports_ocr"):
+            result["Supports OCR"] = meta.supports_ocr
+            result["Supports Layout"] = meta.supports_layout
+            result["Supports Gen"] = meta.supports_generation
+            result["Max Sequence"] = meta.max_sequence_length
+            
+        return result
