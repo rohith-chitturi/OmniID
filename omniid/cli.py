@@ -35,6 +35,13 @@ def main():
     comp_parser.add_argument("exp_id", type=str)
     comp_parser.add_argument("run1", type=str)
     comp_parser.add_argument("run2", type=str)
+    
+    models_parser = subparsers.add_parser("models", help="Foundation Encoder Operations")
+    models_subparsers = models_parser.add_subparsers(dest="models_command")
+    
+    # omniid models benchmark dinov2
+    bench_parser = models_subparsers.add_parser("benchmark")
+    bench_parser.add_argument("encoder", type=str, help="Name of the encoder to benchmark (e.g. dinov2)")
 
     args = parser.parse_args()
 
@@ -103,6 +110,18 @@ def main():
                         print(f"{k}:\n  {args.run1}: {cfg1.get(k)}\n  {args.run2}: {cfg2.get(k)}\n")
             except Exception as e:
                 print(f"Error comparing runs: {e}")
+                
+    elif args.command == "models":
+        if args.models_command == "benchmark":
+            from omniid.models.benchmark import BenchmarkHarness
+            import json
+            try:
+                harness = BenchmarkHarness(args.encoder)
+                results = harness.run()
+                print(f"\n--- Benchmark: {args.encoder} ---")
+                print(json.dumps(results, indent=2))
+            except Exception as e:
+                print(f"Benchmark failed: {e}")
     else:
         parser.print_help()
 
