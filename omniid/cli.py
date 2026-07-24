@@ -39,6 +39,17 @@ def main():
     models_parser = subparsers.add_parser("models", help="Foundation Encoder Operations")
     models_subparsers = models_parser.add_subparsers(dest="models_command")
     
+    # omniid models list
+    list_parser = models_subparsers.add_parser("list")
+    
+    # omniid models info dinov2
+    info_parser = models_subparsers.add_parser("info")
+    info_parser.add_argument("encoder", type=str)
+    
+    # omniid models verify dinov2
+    verify_parser = models_subparsers.add_parser("verify")
+    verify_parser.add_argument("encoder", type=str)
+    
     # omniid models benchmark dinov2
     bench_parser = models_subparsers.add_parser("benchmark")
     bench_parser.add_argument("encoder", type=str, help="Name of the encoder to benchmark (e.g. dinov2)")
@@ -112,12 +123,30 @@ def main():
                 print(f"Error comparing runs: {e}")
                 
     elif args.command == "models":
-        if args.models_command == "benchmark":
+        if args.models_command == "list":
+            from omniid.models.registry import BACKBONE_REGISTRY
+            print("Registered Foundation Encoders:")
+            for k in BACKBONE_REGISTRY._registry.keys():
+                print(f"  - {k}")
+                
+        elif args.models_command == "info":
+            from omniid.models.builder import build_encoder
+            encoder = build_encoder(args.encoder)
+            print(encoder.metadata.model_dump_json(indent=2))
+            
+        elif args.models_command == "verify":
+            print(f"Verifying {args.encoder} checkpoint checksums...")
+            from omniid.models.builder import build_encoder
+            encoder = build_encoder(args.encoder)
+            encoder.load_weights()
+            print("Verification successful.")
+            
+        elif args.models_command == "benchmark":
             from omniid.models.benchmark import BenchmarkHarness
             import json
             try:
-                harness = BenchmarkHarness(args.encoder)
-                results = harness.run()
+                harness = BenchmarkHarness()
+                results = harness.run(args.encoder)
                 print(f"\n--- Benchmark: {args.encoder} ---")
                 print(json.dumps(results, indent=2))
             except Exception as e:
