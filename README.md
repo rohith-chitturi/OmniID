@@ -23,7 +23,7 @@
 
 ## 📖 Overview
 
-**OmniID** is an open-source, research-grade foundation model designed to learn universal identity representations across multiple biometric and document modalities. Built on the principles of self-supervised representation learning, OmniID moves beyond narrow identity tasks (like isolated facial recognition or OCR) to create a single, generalized identity embedding space.
+**OmniID** provides a research-grade multimodal data engineering platform for constructing, validating, versioning, governing, and publishing identity datasets for large-scale foundation model pretraining and downstream biometric intelligence tasks.
 
 The learned embeddings power downstream identity intelligence tasks including:
 - **Multimodal Identity Verification** (1:1 Matching)
