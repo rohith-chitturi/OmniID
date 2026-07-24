@@ -27,9 +27,49 @@
 
 The learned embeddings power downstream identity intelligence tasks including:
 - **Multimodal Identity Verification** (1:1 Matching)
-- **High-Speed Identity Retrieval** (1:N Search)
-- **Document Intelligence & Forgery Detection**
-- **Liveness & Presentation Attack Detection (PAD)**
+- **Identity Retrieval & Deduplication** (1:N Search)
+- **Document & Biometric Fraud Detection**
+- **Cross-Modal Retrieval** (e.g., retrieving a Face given a Voice)
+
+## 🚀 Quick Start Demonstration
+
+### 1. Generate Synthetic Identities
+OmniID includes a built-in Universal Synthetic Identity Engine (USIE) to generate reproducible, scenario-driven mock identities for testing.
+```python
+from omniid.synthetic import SyntheticIdentityGenerator
+
+generator = SyntheticIdentityGenerator()
+generator.generate(
+    scenario="passport_verification",
+    count=1000,
+    seed=42,
+    output_dir="./synthetic_dataset",
+    profile="clean"
+)
+```
+
+### 2. Process via Data Engine
+The Universal Identity Data Engine (UIDE) normalizes, validates, and fingerprints raw directories into strict ML datasets.
+```python
+from omniid.sdk import DatasetClient
+
+client = DatasetClient()
+manifest = (
+    client
+    .ingest("./synthetic_dataset")
+    .validate()
+    .assess_quality()
+    .normalize()
+    .fingerprint()
+    .generate_manifest(output_dir="./artifacts")
+    .publish("./artifacts")
+)
+```
+
+Or via CLI:
+```bash
+omniid dataset build ./synthetic_dataset --output ./artifacts
+```
 
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
