@@ -1,0 +1,45 @@
+{
+  "train_loss": [
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    },
+    {
+      "value": 0.5
+    }
+  ],
+  "event_checkpoint_saved": [
+    {
+      "value": 1,
+      "step": 1
+    },
+    {
+      "value": 1,
+      "step": 2
+    },
+    {
+      "value": 1,
+      "step": 3
+    }
+  ]
+}

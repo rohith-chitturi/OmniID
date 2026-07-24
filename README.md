@@ -84,6 +84,35 @@ omniid experiment diff EXP-0001 EXP-0002
 omniid experiment reproduce EXP-0001
 ```
 
+### 4. Execute ML Workloads (TEE)
+The Training & Execution Engine (TEE) manages the hardware lifecycle, decoupling models from training loops through `EventBus` hooks and abstract `DeviceManager` deployments.
+
+```python
+from omniid.runtime.core.engine import ExecutionEngine
+from omniid.runtime.core.context import RuntimeContext
+from omniid.runtime.trainer.base import PlaceholderTrainer, PlaceholderEncoder
+from omniid.runtime.data.module import IdentityDataModule
+from omniid.runtime.callbacks.base import CheckpointCallback, ProgressBarCallback
+
+# 1. Context wraps Experiment & System Config
+context = RuntimeContext(...)
+
+# 2. Engine wraps the lifecycle
+engine = ExecutionEngine(
+    context=context,
+    trainer_cls=PlaceholderTrainer,
+    model=PlaceholderEncoder(),
+    datamodule=IdentityDataModule()
+)
+
+# 3. Callbacks respond to EventBus signals
+engine.register_callback(ProgressBarCallback())
+engine.register_callback(CheckpointCallback())
+
+# 4. Execute orchestrates the training, validation, and snapshot process
+engine.execute()
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---
