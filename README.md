@@ -133,6 +133,26 @@ omniid models benchmark dinov2
 }
 ```
 
+### 6. Document Understanding Framework (DUF)
+OmniID seamlessly extends into Document AI. Our `DocumentPreprocessingPipeline` isolates layout normalization and OCR routing from the underlying neural architectures.
+
+```bash
+# Instantiate a multi-modal document encoder seamlessly
+omniid models benchmark layoutlmv3
+```
+```json
+{
+  "Model": "layoutlmv3_base",
+  "Architecture": "Transformer with Spatial Embeddings",
+  "Embedding": 768,
+  "Supports OCR": true,
+  "Supports Layout": true,
+  "Load Time": "0.1502s",
+  "Preprocessing Time": "0.0012s",
+  "Output Shape": [1, 768]
+}
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---
