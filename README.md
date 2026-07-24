@@ -113,6 +113,26 @@ engine.register_callback(CheckpointCallback())
 engine.execute()
 ```
 
+### 5. Foundation Encoder Framework (FEF)
+OmniID wraps Vision Backbones (DINOv2, ViT) into a universal contract. The framework abstracts out preprocessing and execution latency, allowing instant dry-run benchmarking without setting up training loops.
+
+```bash
+# Instantiate the encoder natively
+omniid models benchmark dinov2
+```
+```json
+{
+  "encoder": "dinov2",
+  "latency_sec": 0.045,
+  "output_shape": [1, 384],
+  "patch_size": 14,
+  "preprocessing": {
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225]
+  }
+}
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---
