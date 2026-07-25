@@ -1,6 +1,8 @@
 import argparse
-from omniid.sdk.client import DatasetClient
+import click
+import json
 import logging
+from omniid.sdk.client import DatasetClient
 
 logging.basicConfig(level=logging.INFO)
 
@@ -53,6 +55,12 @@ def main():
     # omniid models benchmark dinov2
     bench_parser = models_subparsers.add_parser("benchmark")
     bench_parser.add_argument("encoder", type=str, help="Name of the encoder to benchmark (e.g. dinov2)")
+
+    fusion_parser = subparsers.add_parser("fusion", help="Manage Multimodal Fusion modules")
+    fusion_subparsers = fusion_parser.add_subparsers(dest="fusion_command")
+    
+    bench_fusion_parser = fusion_subparsers.add_parser("benchmark")
+    bench_fusion_parser.add_argument("name", type=str, help="Name of fusion strategy to benchmark")
 
     args = parser.parse_args()
 
@@ -151,28 +159,22 @@ def main():
                 print(json.dumps(results, indent=2))
             except Exception as e:
                 print(f"Benchmark failed: {e}")
+                
+    elif args.command == "fusion":
+        if args.fusion_command == "benchmark":
+            from omniid.fusion.benchmark import FusionBenchmarkHarness
+            import json
+            try:
+                print(f"Initializing Fusion Benchmark for '{args.name}'...\n")
+                modality_dims = {"face": 384, "document": 768, "voice": 512}
+                target_dim = 512
+                harness = FusionBenchmarkHarness(args.name, target_dim=target_dim, modality_dims=modality_dims)
+                results = harness.run()
+                print(json.dumps(results, indent=2))
+            except Exception as e:
+                print(f"Error: {str(e)}")
     else:
         parser.print_help()
-
-@cli.group()
-def fusion():
-    """Manage Multimodal Fusion modules."""
-    pass
-
-@fusion.command(name="benchmark")
-@click.argument("name")
-def benchmark_fusion(name: str):
-    """Profile fusion latency, memory, and output dimensions."""
-    from omniid.fusion.benchmark import FusionBenchmarkHarness
-    try:
-        click.echo(f"Initializing Fusion Benchmark for '{name}'...\n")
-        modality_dims = {"face": 384, "document": 768, "voice": 512}
-        target_dim = 512
-        harness = FusionBenchmarkHarness(name, target_dim=target_dim, modality_dims=modality_dims)
-        results = harness.run()
-        click.echo(json.dumps(results, indent=2))
-    except Exception as e:
-        click.echo(f"Error: {str(e)}", err=True)
 
 if __name__ == "__main__":
     main()
