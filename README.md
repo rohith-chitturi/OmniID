@@ -153,6 +153,24 @@ omniid models benchmark layoutlmv3
 }
 ```
 
+### 7. Multimodal Fusion Framework (MFF)
+OmniID fuses disparate modalities (Face, Document, etc.) into a Universal Identity Representation via standard Attention-based or Concat-based fusion blocks. The Execution Engine relies solely on this registry, staying oblivious to the internal modality-alignment math.
+
+```bash
+omniid fusion benchmark cross_attention
+```
+```json
+{
+  "Fusion Strategy": "cross_attention",
+  "Target Dim": 512,
+  "Parameters": 1339392,
+  "Projection Time": "0.0034s",
+  "Fusion Time": "0.0210s",
+  "Output Shape": [2, 512],
+  "Attention Support": true
+}
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---
