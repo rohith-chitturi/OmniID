@@ -188,6 +188,23 @@ omniid objectives info vicreg
 }
 ```
 
+### 9. Evaluation & Benchmark Framework (EBF)
+Representations are evaluated rigorously through decoupled metrics suites. The Evaluators ingest normalized embeddings and ground-truth labels and spit out standardized, reproducible Evaluation Reports.
+
+```bash
+omniid eval info retrieval
+```
+```json
+{
+  "name": "retrieval",
+  "task_type": "ranking",
+  "required_inputs": ["embeddings", "labels"],
+  "primary_metric": "mAP",
+  "supports_multimodal": true,
+  "supports_batching": true
+}
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---

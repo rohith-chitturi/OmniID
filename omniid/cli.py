@@ -69,6 +69,20 @@ def main():
     obj_info_parser = obj_subparsers.add_parser("info")
     obj_info_parser.add_argument("name", type=str)
 
+    eval_parser = subparsers.add_parser("eval", help="Manage Evaluation & Benchmark Framework")
+    eval_subparsers = eval_parser.add_subparsers(dest="eval_command")
+    
+    eval_list_parser = eval_subparsers.add_parser("list")
+    
+    eval_info_parser = eval_subparsers.add_parser("info")
+    eval_info_parser.add_argument("task", type=str)
+    
+    eval_run_parser = eval_subparsers.add_parser("run")
+    eval_run_parser.add_argument("task", type=str)
+    
+    eval_bench_parser = eval_subparsers.add_parser("benchmark")
+    eval_bench_parser.add_argument("task", type=str)
+
     args = parser.parse_args()
 
     if args.command == "dataset" and args.action == "build":
@@ -197,6 +211,47 @@ def main():
                 print(objective.metadata.model_dump_json(indent=2))
             except Exception as e:
                 print(f"Error: {str(e)}")
+                
+    elif args.command == "eval":
+        if args.eval_command == "list":
+            from omniid.eval.registry import EVALUATOR_REGISTRY
+            import omniid.eval.builder
+            print("Registered Evaluation Suites:")
+            for k in EVALUATOR_REGISTRY._registry.keys():
+                print(f"  - {k}")
+                
+        elif args.eval_command == "info":
+            from omniid.eval.builder import build_evaluator
+            try:
+                evaluator = build_evaluator(args.task)
+                print(evaluator.metadata.model_dump_json(indent=2))
+            except Exception as e:
+                print(f"Error: {str(e)}")
+                
+        elif args.eval_command == "run":
+            from omniid.eval.builder import build_evaluator
+            import torch
+            try:
+                print(f"Running mock evaluation for '{args.task}'...\n")
+                evaluator = build_evaluator(args.task)
+                
+                # Generate mock data
+                embeddings = torch.randn(100, 128)
+                labels = torch.randint(0, 10, (100,))
+                
+                report = evaluator.evaluate(embeddings, labels)
+                import json
+                print(json.dumps({
+                    "evaluator": report.evaluator_name,
+                    "metrics": report.metrics,
+                    "runtime_ms": report.runtime.get("total_ms", 0)
+                }, indent=2))
+            except Exception as e:
+                print(f"Error: {str(e)}")
+                
+        elif args.eval_command == "benchmark":
+            print(f"Benchmarking (System performance) for {args.task} is not fully implemented in CLI yet.")
+            
     else:
         parser.print_help()
 
