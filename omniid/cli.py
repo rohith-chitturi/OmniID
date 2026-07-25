@@ -154,5 +154,25 @@ def main():
     else:
         parser.print_help()
 
+@cli.group()
+def fusion():
+    """Manage Multimodal Fusion modules."""
+    pass
+
+@fusion.command(name="benchmark")
+@click.argument("name")
+def benchmark_fusion(name: str):
+    """Profile fusion latency, memory, and output dimensions."""
+    from omniid.fusion.benchmark import FusionBenchmarkHarness
+    try:
+        click.echo(f"Initializing Fusion Benchmark for '{name}'...\n")
+        modality_dims = {"face": 384, "document": 768, "voice": 512}
+        target_dim = 512
+        harness = FusionBenchmarkHarness(name, target_dim=target_dim, modality_dims=modality_dims)
+        results = harness.run()
+        click.echo(json.dumps(results, indent=2))
+    except Exception as e:
+        click.echo(f"Error: {str(e)}", err=True)
+
 if __name__ == "__main__":
     main()
