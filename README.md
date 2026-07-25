@@ -171,6 +171,23 @@ omniid fusion benchmark cross_attention
 }
 ```
 
+### 8. Self-Supervised Learning Framework (SSLF)
+Representations require optimization. OmniID defines interchangeably configurable loss objectives (SimCLR, VICReg, BYOL, CLIP). These objectives decouple the mathematical loss logic entirely from the Training execution framework.
+
+```bash
+omniid objectives info vicreg
+```
+```json
+{
+  "name": "vicreg",
+  "family": "regularization",
+  "requires_negatives": false,
+  "requires_target_network": false,
+  "supports_multimodal": false,
+  "minimum_views": 2
+}
+```
+
 We treat OmniID as a **research-first Foundation Model project**. Every architectural decision, experiment, and GitHub artifact reflects professional AI research focused on reproducibility, extensibility, and scientific rigor.
 
 ---

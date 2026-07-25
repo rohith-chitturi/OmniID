@@ -62,6 +62,13 @@ def main():
     bench_fusion_parser = fusion_subparsers.add_parser("benchmark")
     bench_fusion_parser.add_argument("name", type=str, help="Name of fusion strategy to benchmark")
 
+    obj_parser = subparsers.add_parser("objectives", help="Manage Optimization Objectives")
+    obj_subparsers = obj_parser.add_subparsers(dest="obj_command")
+    
+    obj_list_parser = obj_subparsers.add_parser("list")
+    obj_info_parser = obj_subparsers.add_parser("info")
+    obj_info_parser.add_argument("name", type=str)
+
     args = parser.parse_args()
 
     if args.command == "dataset" and args.action == "build":
@@ -171,6 +178,23 @@ def main():
                 harness = FusionBenchmarkHarness(args.name, target_dim=target_dim, modality_dims=modality_dims)
                 results = harness.run()
                 print(json.dumps(results, indent=2))
+            except Exception as e:
+                print(f"Error: {str(e)}")
+                
+    elif args.command == "objectives":
+        if args.obj_command == "list":
+            from omniid.objectives.registry import OBJECTIVE_REGISTRY
+            # Import to trigger registration
+            import omniid.objectives.builder
+            print("Registered Optimization Objectives:")
+            for k in OBJECTIVE_REGISTRY._registry.keys():
+                print(f"  - {k}")
+                
+        elif args.obj_command == "info":
+            from omniid.objectives.builder import build_objective
+            try:
+                objective = build_objective(args.name)
+                print(objective.metadata.model_dump_json(indent=2))
             except Exception as e:
                 print(f"Error: {str(e)}")
     else:
