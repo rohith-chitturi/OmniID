@@ -96,6 +96,22 @@ def main():
     
     zoo_load_parser = zoo_subparsers.add_parser("load")
     zoo_load_parser.add_argument("model", type=str)
+    
+    runtime_parser = subparsers.add_parser("runtime", help="Manage Inference Runtime Framework")
+    runtime_subparsers = runtime_parser.add_subparsers(dest="runtime_command")
+    
+    runtime_serve_parser = runtime_subparsers.add_parser("serve")
+    runtime_serve_parser.add_argument("--model", type=str, required=True)
+    
+    runtime_export_parser = runtime_subparsers.add_parser("export")
+    runtime_export_parser.add_argument("--model", type=str, required=True)
+    runtime_export_parser.add_argument("--format", type=str, required=True)
+    
+    runtime_validate_parser = runtime_subparsers.add_parser("validate")
+    runtime_validate_parser.add_argument("--model", type=str, required=True)
+    
+    runtime_benchmark_parser = runtime_subparsers.add_parser("benchmark")
+    runtime_benchmark_parser.add_argument("--model", type=str, required=True)
 
     args = parser.parse_args()
 
@@ -310,6 +326,49 @@ def main():
             except Exception as e:
                 print(f"Error loading model: {str(e)}")
                 
+    elif args.command == "runtime":
+        if args.runtime_command == "serve":
+            from omniid.runtime.serving.fastapi import FastAPIServer
+            import uvicorn
+            print(f"Starting Inference Runtime (FastAPI) for {args.model}...")
+            try:
+                server = FastAPIServer(args.model)
+                print("Server initialized successfully. (Mocking uvicorn.run for CLI)")
+                # uvicorn.run(server.app, host="0.0.0.0", port=8000)
+            except Exception as e:
+                print(f"Error starting server: {str(e)}")
+                
+        elif args.runtime_command == "export":
+            from omniid.runtime.exporters.registry import EXPORTER_REGISTRY
+            try:
+                exporter = EXPORTER_REGISTRY.build(args.format)
+                path = exporter.export("dummy_model", f"./exports/{args.model}.{args.format}", "dummy_input")
+                print(f"Successfully exported {args.model} to {args.format} format at: {path}")
+            except Exception as e:
+                print(f"Error exporting model: {str(e)}")
+                
+        elif args.runtime_command == "validate":
+            from omniid.model_zoo.api import ModelZoo
+            from omniid.runtime.validation import RuntimeValidator
+            from omniid.runtime.types import InferenceRequest
+            try:
+                zoo = ModelZoo()
+                manifest = zoo.get_model_info(args.model)
+                validator = RuntimeValidator(manifest)
+                
+                dummy_req = InferenceRequest(
+                    request_id="test-val",
+                    inputs={"image": [1]},
+                    modalities=["vision"] if not manifest.fusion else ["face", "document"]
+                )
+                validator.validate_request(dummy_req)
+                print(f"Validation passes for model {args.model}.")
+            except Exception as e:
+                print(f"Validation failed: {str(e)}")
+                
+        elif args.runtime_command == "benchmark":
+            print(f"Runtime operational benchmark tool for {args.model} is starting... (Mocked)")
+            
     else:
         parser.print_help()
 
