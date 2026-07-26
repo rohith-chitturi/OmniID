@@ -82,6 +82,20 @@ def main():
     
     eval_bench_parser = eval_subparsers.add_parser("benchmark")
     eval_bench_parser.add_argument("task", type=str)
+    
+    zoo_parser = subparsers.add_parser("zoo", help="Manage Model Zoo & Checkpoint Registry")
+    zoo_subparsers = zoo_parser.add_subparsers(dest="zoo_command")
+    
+    zoo_list_parser = zoo_subparsers.add_parser("list")
+    
+    zoo_info_parser = zoo_subparsers.add_parser("info")
+    zoo_info_parser.add_argument("model", type=str)
+    
+    zoo_verify_parser = zoo_subparsers.add_parser("verify")
+    zoo_verify_parser.add_argument("model", type=str)
+    
+    zoo_load_parser = zoo_subparsers.add_parser("load")
+    zoo_load_parser.add_argument("model", type=str)
 
     args = parser.parse_args()
 
@@ -252,6 +266,50 @@ def main():
         elif args.eval_command == "benchmark":
             print(f"Benchmarking (System performance) for {args.task} is not fully implemented in CLI yet.")
             
+    elif args.command == "zoo":
+        from omniid.model_zoo.api import ModelZoo
+        zoo = ModelZoo()
+        
+        if args.zoo_command == "list":
+            print("Discovered Models:")
+            for m in zoo.list_models():
+                print(f"  - {m}")
+                
+        elif args.zoo_command == "info":
+            try:
+                card = zoo.get_model_card(args.model)
+                print(card.model_dump_json(indent=2))
+            except Exception as e:
+                print(f"Error fetching model info: {str(e)}")
+                
+        elif args.zoo_command == "verify":
+            try:
+                # Mock current execution config
+                import omniid
+                current_config = {
+                    "encoder": "dinov2",
+                    "fusion": "cross_attention"
+                }
+                manifest = zoo.get_model_info(args.model)
+                is_compatible, msg = zoo.validator.validate(manifest, current_config)
+                print(f"Verification Result: {'PASS' if is_compatible else 'FAIL'}")
+                print(f"Details: {msg}")
+            except Exception as e:
+                print(f"Verification Error: {str(e)}")
+                
+        elif args.zoo_command == "load":
+            print(f"Mock loading {args.model} checkpoint via Zoo API...")
+            try:
+                # Mock current execution config
+                current_config = {
+                    "encoder": "dinov2",
+                    "fusion": "cross_attention"
+                }
+                path = zoo.load(args.model, current_config)
+                print(f"Successfully resolved checkpoint to: {path}")
+            except Exception as e:
+                print(f"Error loading model: {str(e)}")
+                
     else:
         parser.print_help()
 
